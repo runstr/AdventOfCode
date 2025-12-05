@@ -2,7 +2,7 @@ import pathlib
 from Tools.tools import load_data_as_lines, load_data, load_data_as_int, timeexecution
 from aocd import submit
 filepath = pathlib.Path(__file__).parent.resolve()
-EXAMPLE = True
+EXAMPLE = False
 SUBMIT_ANSWER = False
 
 def check_if_in_range(number, rng):
