@@ -20,7 +20,7 @@ func convert_line(input string) (string, int) {
 func main() {
 	var content []byte
 	var err error
-	content, err = os.ReadFile("C:\\Users\\Rune\\Documents\\AoC22\\go_code\\y2025\\day1\\input.txt")
+	content, err = os.ReadFile("C:\\Users\\Rune\\AdventOfCode\\go_code\\y2025\\day1\\input.txt")
 	var string_content string
 	string_content = string(content)
 	var split_string []string
