@@ -1,13 +1,64 @@
 import pathlib
 from Tools.tools import load_data_as_lines, load_data, load_data_as_int, timeexecution
 from aocd import submit
+import math
 filepath = pathlib.Path(__file__).parent.resolve()
 EXAMPLE = True
 SUBMIT_ANSWER = False
 
+
+def shortest_distance(a, b):
+    return math.sqrt((b[0]-a[0])**2+(b[1]-a[1])**2+(b[2]-a[2])**2)
+
 def get_my_answer():
-    my_answer = load_data(filepath, example=EXAMPLE)
-    return my_answer
+    data = load_data_as_lines(filepath, example=EXAMPLE)
+    points = []
+    for line in data:
+        x, y, z = line.split(",")
+        points.append(tuple(map(int, (x, y, z))))
+    remaining_points = set(points)
+    connections = []
+    path_distances = []
+    for i in range(0, len(points)-1):
+        for j in range(i+1, len(points)):
+            a = points[i]
+            b = points[j]
+            if (i, j) in connections:
+                continue
+            minimum = shortest_distance(a, b)
+            path_distances.append((minimum, a,b))
+    path_distances.sort()
+    connections = {}
+    circuits = 0
+    best_circuits = None
+    remaining_points = set(points)
+    for index, path in enumerate(path_distances):
+        _, a, b = path
+        a_in = None
+        b_in = None
+        print(a, b)
+        for key, value in connections.items():
+            if b in value:
+                b_in = key
+            elif a in value:
+                a_in = key
+        if a_in is not None and b_in is None:
+            connections[a_in].add(b)
+        elif a_in is None and b_in is not None:
+            connections[b_in].add(a)
+        elif a_in is not None and b_in is not None:
+            connections[a_in] = connections[a_in].union(connections[b_in])
+            connections[b_in] = set()
+        else:
+            connections[circuits] = {a, b}
+            circuits += 1
+        total_circuits = 0
+        for key, value in connections.items():
+            print(key, value)
+            if value:
+                total_circuits+=1
+        print()
+    return best_circuits
 
 
 @timeexecution
