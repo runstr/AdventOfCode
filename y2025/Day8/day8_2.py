@@ -3,7 +3,7 @@ from Tools.tools import load_data_as_lines, load_data, load_data_as_int, timeexe
 from aocd import submit
 import math
 filepath = pathlib.Path(__file__).parent.resolve()
-EXAMPLE = True
+EXAMPLE = False
 SUBMIT_ANSWER = False
 
 
@@ -16,7 +16,6 @@ def get_my_answer():
     for line in data:
         x, y, z = line.split(",")
         points.append(tuple(map(int, (x, y, z))))
-    remaining_points = set(points)
     connections = []
     path_distances = []
     for i in range(0, len(points)-1):
@@ -30,13 +29,12 @@ def get_my_answer():
     path_distances.sort()
     connections = {}
     circuits = 0
-    best_circuits = None
+    final_points = None
     remaining_points = set(points)
     for index, path in enumerate(path_distances):
         _, a, b = path
         a_in = None
         b_in = None
-        print(a, b)
         for key, value in connections.items():
             if b in value:
                 b_in = key
@@ -44,21 +42,22 @@ def get_my_answer():
                 a_in = key
         if a_in is not None and b_in is None:
             connections[a_in].add(b)
+            remaining_points.discard(b)
         elif a_in is None and b_in is not None:
             connections[b_in].add(a)
+            remaining_points.discard(a)
         elif a_in is not None and b_in is not None:
             connections[a_in] = connections[a_in].union(connections[b_in])
-            connections[b_in] = set()
+            connections.pop(b_in)
         else:
+            remaining_points.discard(a)
+            remaining_points.discard(b)
             connections[circuits] = {a, b}
             circuits += 1
-        total_circuits = 0
-        for key, value in connections.items():
-            print(key, value)
-            if value:
-                total_circuits+=1
-        print()
-    return best_circuits
+        if len(connections) == 1 and not remaining_points:
+            final_points = (a,b)
+            break
+    return final_points[0][0]*final_points[1][0]
 
 
 @timeexecution

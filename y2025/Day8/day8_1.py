@@ -32,13 +32,14 @@ def get_my_answer():
     circuits = 0
     for path in path_distances[:total_connections]:
         _, a, b = path
-        a_in = None
-        b_in = None
+        a_in, b_in = None, None
         for key, value in connections.items():
             if b in value:
                 b_in = key
             elif a in value:
                 a_in = key
+            if a_in and b_in:
+                break
         if a_in is not None and b_in is None:
             connections[a_in].add(b)
         elif a_in is None and b_in is not None:
@@ -49,10 +50,7 @@ def get_my_answer():
         else:
             connections[circuits] = {a, b}
             circuits += 1
-    #for key, value in connections.items():
-    #    print(key, value)
-    total_sizes = [len(value) for key, value in connections.items()]
-    total_sizes.sort(reverse=True)
+    total_sizes = sorted([len(value) for key, value in connections.items()], reverse=True)
     total = total_sizes[0]*total_sizes[1]*total_sizes[2]
     return total
 
