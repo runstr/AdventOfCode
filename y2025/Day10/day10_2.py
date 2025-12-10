@@ -16,19 +16,15 @@ def get_my_answer():
         commands = []
         for b in a[1:-1]:
             numbers = list(map(int, b[1:-1].split(",")))
-            command = np.array([1 if i in numbers else 0 for i in range(len(final))])
+            command = [1 if i in numbers else 0 for i in range(len(final))]
             commands.append(command)
         machines.append((final, commands))
+
     total = 0
     for final, commands in machines:
-        equations = [[0]*len(commands) for _ in range(len(final))]
-        for i in range(len(final)):
-            for j, command in enumerate(commands):
-                if command[i] == 1:
-                    equations[i][j] =1
-        lhs_eq = equations
+        lhs_eq = np.transpose(commands)
         rhs_eq = final.tolist()
-        objective = [1]*len(equations[0])
+        objective = [1]*len(lhs_eq[0])
         opt = linprog(c=objective, A_eq = lhs_eq, b_eq = rhs_eq, method = "highs", integrality=1)
         total+= opt.fun
     return total
