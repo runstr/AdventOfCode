@@ -46,7 +46,7 @@ def get_my_answer():
             connections[b_in].add(a)
         elif a_in is not None and b_in is not None:
             connections[a_in] = connections[a_in].union(connections[b_in])
-            connections[b_in] = set()
+            connections.pop(b_in)
         else:
             connections[circuits] = {a, b}
             circuits += 1

@@ -8,8 +8,10 @@ SUBMIT_ANSWER = False
 
 def get_area(x1, y1, x2, y2):
     return (abs(x2-x1)+1)*(abs(y2-y1)+1)
+
 def get_my_answer():
     data = load_data_as_lines(filepath, example=EXAMPLE)
+
     maximum = 0
     for i in range(len(data)-1):
         for j in range(i+1, len(data)):
@@ -18,6 +20,7 @@ def get_my_answer():
             area = get_area(x1, y1, x2, y2)
             if area > maximum:
                 maximum=area
+
     return maximum
 
 

@@ -40,6 +40,8 @@ def get_my_answer():
                 b_in = key
             elif a in value:
                 a_in = key
+            if a_in and b_in:
+                break
         if a_in is not None and b_in is None:
             connections[a_in].add(b)
             remaining_points.discard(b)

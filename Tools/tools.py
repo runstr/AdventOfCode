@@ -64,7 +64,7 @@ def get_todays_date():
 
 def insert_data(todays_date, year):
     filename = __file__[:-14]+"y"+str(year)+"\\Day"+todays_date+"\\input.txt"
-    if path.getsize(filename) == 0:
+    if not path.isfile(filename) or path.getsize(filename) == 0:
         with open(filename, "w") as inputfile:
             inputfile.write(get_data(year=year, day=int(todays_date)))
 
