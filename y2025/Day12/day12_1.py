@@ -3,12 +3,30 @@ from Tools.tools import load_data_as_lines, load_data, load_data_as_int, timeexe
 from aocd import submit
 
 filepath = pathlib.Path(__file__).parent.resolve()
-EXAMPLE = True
+EXAMPLE = False
 SUBMIT_ANSWER = False
 
 def get_my_answer():
-    my_answer = load_data(filepath, example=EXAMPLE)
-    return my_answer
+    data = load_data(filepath, example=EXAMPLE)
+    data = data.split("\n\n")
+    areas = data[6].split("\n")
+    pieces = []
+    for piece in data[:6]:
+        pieces.append(piece[3:].replace("\n", "").count("#"))
+    count = 0
+    full_areas = len(areas)
+    for area in areas:
+        a, b = area.split(": ")
+        total_area = eval(a.replace("x", "*"))
+        total_piece_area = 0
+        for i, piece in enumerate(b.split(" ")):
+            total_piece_area+= int(piece)*pieces[i]
+        if total_piece_area<=total_area:
+            count+=1
+
+
+
+    return count, full_areas
 
 
 @timeexecution
