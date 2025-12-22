@@ -1,7 +1,10 @@
 from datetime import date
 from aocd import get_data
 from os import path, environ
+import subprocess
 import time
+import sys
+import os
 
 
 def set_cookie():
@@ -29,6 +32,20 @@ def load_data_as_lines(filepath, example=False):
         data = f.read().splitlines()
     return data
 
+
+def load_data_as_map(filepath, example=False):
+    if example:
+        filepath = str(filepath)+"\\example.txt"
+    else:
+        filepath = str(filepath)+"\\input.txt"
+    with open(filepath, "r") as f:
+        data = f.read().splitlines()
+    mapping = {}
+    for y in range(len(data)):
+        for x in range(len(data[0])):
+            mapping[(x,y)] = data[y][x]
+    max_y, max_x = len(data), len(data[0])
+    return mapping, max_x,  max_y
 
 def load_data_as_int(filepath, example=False):
     if example:
@@ -63,8 +80,18 @@ def get_todays_date():
 
 
 def insert_data(todays_date, year):
+    day_name = __file__[:-14]+"y"+str(year)+"\\Day"+todays_date
+
+    if not path.exists(day_name):
+        bat_file = "new_day.bat"
+        working_dir = r"C:\Users\Rune\AdventOfCode\Tools"
+        subprocess.run([bat_file, str(todays_date), str(year)], cwd=working_dir, shell=True)
+        # Re-execute the current Python script
+        python = sys.executable  # path to the Python interpreter
+        os.execv(python, [python] + sys.argv)
+
     filename = __file__[:-14]+"y"+str(year)+"\\Day"+todays_date+"\\input.txt"
-    if not path.isfile(filename) or path.getsize(filename) == 0:
+    if path.isfile(filename) or path.getsize(filename) == 0:
         with open(filename, "w") as inputfile:
             inputfile.write(get_data(year=year, day=int(todays_date)))
 

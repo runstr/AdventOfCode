@@ -23,7 +23,7 @@ func get_my_answer() {
 			number := string(y)
 			test_sequence := ""
 			for index := 0; index <= len(number)/2; index++ {
-				test_sequence += number[index]
+				test_sequence += string(number[0])
 			}
 		}
 
