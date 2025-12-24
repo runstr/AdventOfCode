@@ -4,7 +4,7 @@ from aocd import submit
 import re
 filepath = pathlib.Path(__file__).parent.resolve()
 EXAMPLE = False
-SUBMIT_ANSWER = True
+SUBMIT_ANSWER = False
 
 def get_my_answer():
     data = load_data_as_lines(filepath, example=EXAMPLE)
@@ -24,7 +24,6 @@ def get_my_answer():
         try:
             childs = rules[parent]
         except KeyError:
-            print(parent)
             continue
         for child in childs:
             gold_bag_childs.append((str(int(child[0])*int(num)), child[1]))

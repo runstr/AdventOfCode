@@ -26,9 +26,6 @@ def get_my_answer():
         for key, value in rules.items():
             if parent in value :
                 gold_bag_parrents.append(key)
-
-
-    print(all_bags)
     return len(all_bags)
 
 

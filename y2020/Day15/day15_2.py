@@ -3,7 +3,7 @@ from Tools.tools import load_data_as_lines, load_data, load_data_as_int, timeexe
 from aocd import submit
 filepath = pathlib.Path(__file__).parent.resolve()
 EXAMPLE = False
-SUBMIT_ANSWER = True
+SUBMIT_ANSWER = False
 
 def get_my_answer():
     list_of_numbers = list(map(int,load_data(filepath, example=EXAMPLE).split(",")))

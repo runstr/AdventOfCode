@@ -5,8 +5,9 @@ from aocd import submit
 from y2024.Day7.day7_2 import check_number
 
 filepath = pathlib.Path(__file__).parent.resolve()
-EXAMPLE = True
+EXAMPLE = False
 SUBMIT_ANSWER = False
+
 def check_number(number, rules):
     for rule in rules:
         if rule[0]<=number<=rule[1]:

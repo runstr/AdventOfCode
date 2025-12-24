@@ -37,7 +37,7 @@ def get_my_answer():
         j+=1
 
 
-    return total_numbers, min(total_numbers)+max(total_numbers)
+    return min(total_numbers)+max(total_numbers)
 
 
 @timeexecution

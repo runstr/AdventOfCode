@@ -4,7 +4,7 @@ from Tools.tools import load_data_as_lines, load_data, load_data_as_int, timeexe
 from aocd import submit
 filepath = pathlib.Path(__file__).parent.resolve()
 EXAMPLE = False
-SUBMIT_ANSWER = True
+SUBMIT_ANSWER = False
 
 def get_my_answer():
     # Follow formula for chineese remainder theorem

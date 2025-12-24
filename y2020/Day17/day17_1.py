@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 filepath = pathlib.Path(__file__).parent.resolve()
 EXAMPLE = False
-SUBMIT_ANSWER = True
+SUBMIT_ANSWER = False
 
 def check_closets_neighbours(x,y,z, active):
     count = 0
