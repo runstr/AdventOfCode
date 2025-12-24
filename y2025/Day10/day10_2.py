@@ -27,7 +27,7 @@ def get_my_answer():
         objective = [1]*len(lhs_eq[0])
         opt = linprog(c=objective, A_eq = lhs_eq, b_eq = rhs_eq, method = "highs", integrality=1)
         total+= opt.fun
-    return total
+    return int(total)
 
 
 @timeexecution

@@ -26,7 +26,7 @@ def get_my_answer():
 
 
 
-    return count, full_areas
+    return count
 
 
 @timeexecution

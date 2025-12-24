@@ -8,7 +8,7 @@ SUBMIT_ANSWER = False
 def get_closets(box_map, data):
     count = 0
     access = []
-    ds = [(-1, 0), (1, 0), (0, 1), (0,-1), (1, 1), (-1,-1)]
+    ds = [(-1, 0), (1, 0), (0, 1), (0,-1), (1, 1), (-1,-1),(-1,1), (1,-1)]
     for box in box_map:
         closest = 0
         for dx, dy in ds:

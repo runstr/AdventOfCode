@@ -4,13 +4,11 @@ from aocd import submit
 
 filepath = pathlib.Path(__file__).parent.resolve()
 EXAMPLE = False
-SUBMIT = False
+SUBMIT = True
 
 
 def get_my_answer():
-    #data = load_data(filepath, example=EXAMPLE)
     line_data = load_data_as_lines(filepath, example=EXAMPLE)
-    #int_data = load_data_as_int(filepath, example=EXAMPLE)
     dial = 50
     zero_times = 0
     for line in line_data:

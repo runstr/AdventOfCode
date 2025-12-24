@@ -5,9 +5,7 @@ filepath = pathlib.Path(__file__).parent.resolve()
 
 
 def get_my_answer():
-    #data = load_data(filepath, example=EXAMPLE)
     line_data = load_data_as_lines(filepath, example=False)
-    #int_data = load_data_as_int(filepath, example=EXAMPLE)
     dial = 50
     zero_times = 0
     for line in line_data:
@@ -28,14 +26,12 @@ def get_my_answer():
             if dial <= 0:
                 zero_times += 1
             dial = dial % 100
-
-        print(letter, og_number, "-->", dial, zero_times)
     return zero_times
 
 
 @timeexecution
 def execution():
-    submit_answer = False
+    SUBMIT_ANSWER = False
     my_answer = get_my_answer()
     print(my_answer)
     this_day = int(str(filepath).split("\\")[-1][3:])

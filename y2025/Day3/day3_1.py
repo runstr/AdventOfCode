@@ -13,7 +13,7 @@ def get_my_answer():
         maximum_number = ""
         numbers = list(map(int, list(line)))
         max_index = -1
-        total_num = 12
+        total_num = 2
         for i in range(total_num-1, -1, -1):
             # Find the maximum number in the remaining sequence after max_index, but making sure there are enough numbers left to fill the remaining digits
             number_sequence = numbers[max_index + 1:len(numbers)-i]
