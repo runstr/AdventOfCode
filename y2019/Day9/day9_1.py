@@ -7,14 +7,18 @@ EXAMPLE = False
 SUBMIT_ANSWER = False
 
 class IntComputer:
-    def __init__(self, instructions, phase_value):
-        self.instructions: dict = instructions
+    def __init__(self):
+        self.instructions: dict = None
         self.instruction_pointer = 0
-        self.phase_value = phase_value
         self.relative_base = 0
         self.output=[]
+        self.input_value = 1
 
-    def decode_instruction(self, opcode):
+    def decode_data(self, data):
+        data = list(map(int, data.split(",")))
+        self.instructions = {i: data[i] for i in range(len(data))}
+
+    def decode_opcode(self, opcode):
         """
         Decode an opcode instruction
         :param opcode:
@@ -39,9 +43,9 @@ class IntComputer:
         value = self.instructions[instruction_pointer]
         return value
 
-    def decode_write(self, parameter, increment):
+    def decode_address(self, parameter, increment):
         if parameter == 1:
-            instruction_pointer =  self.instruction_pointer+increment
+            raise Exception(f"Invalid parameter: {parameter}")
         elif parameter == 0:
             instruction_pointer = self.instructions[self.instruction_pointer+increment]
         elif parameter == 2:
@@ -52,67 +56,72 @@ class IntComputer:
             self.instructions[instruction_pointer] = 0
         return instruction_pointer
 
-    def run_computer(self, input_value):
-        while True:
-            opcode = str(self.instructions[self.instruction_pointer])
-            instruction, first_parameter, second_parameter, third_parameter = self.decode_instruction(opcode)
-            third_val, second_val, first_val = None, None, None
-            if instruction in [1, 2, 3, 5, 6, 7, 8, 9]:
-                first_val = self.decode_value(first_parameter, 1)
-                if instruction in [1, 2, 3, 5, 6, 7, 8]:
-                    second_val = self.decode_value(second_parameter, 2)
-                if instruction in [1, 2, 3, 7, 8]:
-                        third_val = self.decode_write(third_parameter, 3)
-            match instruction:
-                case 99:
-                    return None
-                case 3:
-                    addr = self.decode_write(first_parameter, 1)
-                    if self.phase_value is not None:
-                        self.instructions[addr] = self.phase_value
-                        self.phase_value = None
-                    else:
-                        self.instructions[addr] = input_value
-                    self.instruction_pointer += 2
-                    continue
-                case 4:
-                    value = self.decode_value(first_parameter,1)
-                    self.instruction_pointer += 2
-                    self.output.append(value)
-                    continue
-                case 1:
-                    self.instructions[third_val] = first_val + second_val
-                    self.instruction_pointer += 4
-                case 2:
-                    self.instructions[third_val] = first_val * second_val
-                    self.instruction_pointer += 4
-                case 5:
-                    if first_val:
-                        self.instruction_pointer = second_val
-                    else:
-                        self.instruction_pointer += 3
-                case 6:
-                    if not first_val:
-                        self.instruction_pointer = second_val
-                    else:
-                        self.instruction_pointer += 3
-                case 7:
-                    self.instructions[third_val] = int(first_val < second_val)
-                    self.instruction_pointer += 4
-                case 8:
-                    self.instructions[third_val] = int(first_val == second_val)
-                    self.instruction_pointer += 4
-                case 9:
-                    self.relative_base += first_val
-                    self.instruction_pointer += 2
+    def execute_command(self):
+        instruction, first, second, address = self.decode_instructions()
+        match instruction:
+            case 99:
+                return 0
+            case 1:
+                self.instructions[address] = first + second
+                self.instruction_pointer += 4
+            case 2:
+                self.instructions[address] = first * second
+                self.instruction_pointer += 4
+            case 3:
+                self.instructions[address] = self.input_value
+                self.instruction_pointer += 2
+            case 4:
+                self.output.append(first)
+                self.instruction_pointer += 2
+            case 5:
+                if first:
+                    self.instruction_pointer = second
+                else:
+                    self.instruction_pointer += 3
+            case 6:
+                if not first:
+                    self.instruction_pointer = second
+                else:
+                    self.instruction_pointer += 3
+            case 7:
+                self.instructions[address] = int(first < second)
+                self.instruction_pointer += 4
+            case 8:
+                self.instructions[address] = int(first == second)
+                self.instruction_pointer += 4
+            case 9:
+                self.relative_base += first
+                self.instruction_pointer += 2
+        return 1
+
+    def decode_instructions(self):
+        opcode = str(self.instructions[self.instruction_pointer])
+        instruction, p1, p2, p3 = self.decode_opcode(opcode)
+        first = second = address = None
+        if instruction == 99:
+            return instruction, first, second, address,
+        if instruction == 3:
+            address = self.decode_address(p1, 1)
+            return instruction, first, second, address,
+        first = self.decode_value(p1, 1)
+        second = self.decode_value(p2, 2)
+        if instruction in [1,2,7,8]:
+            address = self.decode_address(p3, 3)
+            return instruction, first, second, address,
+
+        return instruction, first, second, address,
+
+    def run_computer(self):
+        end_instruction = 1
+        while end_instruction:
+            end_instruction = self.execute_command()
 
 
 def get_my_answer():
-    data = list(map(int,load_data(filepath, example=EXAMPLE).split(",")))
-    data_dict = {i:data[i] for i in range(len(data))}
-    print(data_dict)
-    computer = IntComputer(data_dict, None)
-    computer.run_computer(1)
+    data = load_data(filepath, example=EXAMPLE)
+    computer = IntComputer()
+    computer.decode_data(data)
+    computer.run_computer()
     return computer.output[0]
 
 

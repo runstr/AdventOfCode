@@ -9,15 +9,16 @@ SUBMIT_ANSWER = False
 class IntComputer:
     def __init__(self):
         self.instructions: dict = None
-        self.instruction_pointer = 0
-        self.relative_base = 0
-        self.output=[]
+        self.instruction_pointer: int = 0
+        self.relative_base: int = 0
+        self.output: list =[]
+        self.input_value = 1
 
     def decode_data(self, data):
         data = list(map(int, data.split(",")))
         self.instructions = {i: data[i] for i in range(len(data))}
 
-    def decode_instruction(self, opcode):
+    def decode_opcode(self, opcode):
         """
         Decode an opcode instruction
         :param opcode:
@@ -28,7 +29,7 @@ class IntComputer:
         first, second, third = int(opcode[-3]), int(opcode[-4]), int(opcode[-5])
         return instruction, first, second, third
 
-    def decode_value(self, parameter, increment):
+    def decode_value(self, parameter: int , increment: int):
         if parameter == 1:
             instruction_pointer =  self.instruction_pointer+increment
         elif parameter == 0:
@@ -39,10 +40,9 @@ class IntComputer:
             raise Exception(f"Invalid parameter: {parameter}")
         if instruction_pointer not in self.instructions:
             self.instructions[instruction_pointer] = 0
-        value = self.instructions[instruction_pointer]
-        return value
+        return self.instructions[instruction_pointer]
 
-    def decode_address(self, parameter, increment):
+    def decode_address(self, parameter: int, increment: int):
         if parameter == 1:
             raise Exception(f"Invalid parameter: {parameter}")
         elif parameter == 0:
@@ -55,7 +55,8 @@ class IntComputer:
             self.instructions[instruction_pointer] = 0
         return instruction_pointer
 
-    def execute_command(self, instruction, first, second, address, input_value):
+    def execute_command(self):
+        instruction, first, second, address = self.decode_instructions()
         match instruction:
             case 99:
                 return 0
@@ -66,11 +67,12 @@ class IntComputer:
                 self.instructions[address] = first * second
                 self.instruction_pointer += 4
             case 3:
-                self.instructions[address] = input_value
+                self.instructions[address] = self.input_value
                 self.instruction_pointer += 2
             case 4:
                 self.output.append(first)
                 self.instruction_pointer += 2
+                return -1
             case 5:
                 if first:
                     self.instruction_pointer = second
@@ -92,71 +94,70 @@ class IntComputer:
                 self.instruction_pointer += 2
         return 1
 
-    def decode_instructions2(self):
-        opcode = str(self.instructions[self.instruction_pointer])
-        instruction, p1, p2, p3 = self.decode_instruction(opcode)
-
-        first = second = address = None
-
-        match instruction:
-            case 1 | 2 | 7 | 8:
-                # three parameters: value, value, address
-                first = self.decode_value(p1, 1)
-                second = self.decode_value(p2, 2)
-                address = self.decode_address(p3, 3)
-
-            case 3:
-                # one parameter: address
-                address = self.decode_address(p1, 1)
-
-            case 4:
-                # one parameter: value
-                first = self.decode_value(p1, 1)
-
-            case 5 | 6:
-                # two parameters: value, value
-                first = self.decode_value(p1, 1)
-                second = self.decode_value(p2, 2)
-
-            case 9:
-                # one parameter: value
-                first = self.decode_value(p1, 1)
-
-            case 99:
-                pass
-
-            case _:
-                raise Exception(f"Unknown opcode {instruction} at {self.instruction_pointer}")
-
-        return instruction, first, second, address
+    def decode_input(self):
+        return 3
 
     def decode_instructions(self):
         opcode = str(self.instructions[self.instruction_pointer])
-        instruction, first_parameter, second_parameter, third_parameter = self.decode_instruction(opcode)
-        first, second, address = None, None, None
-        if instruction not in [3,99] :
-            first = self.decode_value(first_parameter, 1)
-        if instruction in [1, 2, 5, 6, 7, 8]:
-            second = self.decode_value(second_parameter, 2)
-        if instruction in [1, 2, 7, 8]:
-            address = self.decode_address(third_parameter, 3)
-        elif instruction == 3:
-            address = self.decode_address(first_parameter, 1)
+        instruction, p1, p2, p3 = self.decode_opcode(opcode)
+        first = second = address = -1
+        if instruction == 99:
+            return instruction, first, second, address,
+        if instruction == 3:
+            address = self.decode_address(p1, 1)
+            return instruction, first, second, address,
+        first = self.decode_value(p1, 1)
+        second = self.decode_value(p2, 2)
+        if instruction in [1,2,7,8]:
+            address = self.decode_address(p3, 3)
+            return instruction, first, second, address,
+
         return instruction, first, second, address,
 
     def run_computer(self):
         end_instruction = 1
-        while end_instruction:
-            instruction, first, second, address = self.decode_instructions2()
-            end_instruction = self.execute_command(instruction, first, second, address, 1)
+        directions = {1: (0, 1), 2: (0, -1), 3: (-1, 0), 4: (1, 0)}
+        keys = [1,2,3,4]
+        visited = {}
+        next_paths = [((0,0), 0, self.instructions.copy(),0)]
+        possible_paths = []
+        while next_paths:
+            this_path = next_paths.pop()
+            data = this_path[2]
+            this_point = this_path[0]
+            steps = this_path[1]
+            inst_pointer = this_path[3]
+            for key in keys:
+                new_point = (this_point[0]+directions[key][0], this_point[1]+directions[key][1])
+                new_steps= steps+1
+                if new_point in visited and new_steps > visited[new_point]:
+                    continue
+                self.instructions = data
+                self.instruction_pointer = inst_pointer
+                self.input_value = key
+
+                while end_instruction:
+                    end_instruction = self.execute_command()
+                    if end_instruction == -1:
+                        output = self.output[0]
+                        self.output = []
+                        break
+                visited[new_point] = new_steps
+                if output == 2:
+                    possible_paths.append(new_point)
+                elif output ==1:
+                    next_paths.append((new_point, new_steps, self.instructions.copy(), self.instruction_pointer))
+                else:
+                    continue
+        return possible_paths
+
 
 
 def get_my_answer():
     data = load_data(filepath, example=EXAMPLE)
     computer = IntComputer()
     computer.decode_data(data)
-    computer.run_computer()
-    return computer.output[0]
+    return computer.run_computer()
 
 
 @timeexecution
